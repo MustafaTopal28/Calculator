@@ -1,63 +1,90 @@
-const operations = {
-  add: (num1, num2) => num1 + num2,
-  subtract: (num1, num2) => num1 - num2,
-  multiply: (num1, num2) => num1 * num2,
-  divide: (num1, num2) => num1 / num2,
-};
-
-let num1 = "";
-let num2 = "";
+const displayElement = document.getElementById("display");
+let displayValue = "0";
+let firstNumber = "";
 let operator = "";
+let secondNumber = "";
 
-// Selecting digit buttons
+function updateDisplay() {
+  displayElement.textContent = displayValue;
+}
+
+function appendNumber(number) {
+  if (displayValue === "0" || operator) {
+    displayValue = "";
+  }
+  displayValue += number;
+  updateDisplay();
+}
+
+function clear() {
+  firstNumber = "";
+  operator = "";
+  secondNumber = "";
+  displayValue = "0";
+  updateDisplay();
+}
+
+function setOperator(op) {
+  if (firstNumber && operator && displayValue) {
+    calculate();
+  }
+  operator = op;
+  firstNumber = displayValue;
+  displayValue = "";
+}
+
+function calculate() {
+  if (!operator || !firstNumber || !displayValue) return;
+  secondNumber = displayValue;
+  let result;
+  switch (operator) {
+    case "+":
+      result = parseFloat(firstNumber) + parseFloat(secondNumber);
+      break;
+    case "-":
+      result = parseFloat(firstNumber) - parseFloat(secondNumber);
+      break;
+    case "x":
+      result = parseFloat(firstNumber) * parseFloat(secondNumber);
+      break;
+    case "/":
+      if (parseFloat(secondNumber) === 0) {
+        displayValue = "Error: Division by 0";
+        updateDisplay();
+        return;
+      }
+      result = parseFloat(firstNumber) / parseFloat(secondNumber);
+      break;
+  }
+  displayValue = Math.round(result * 100) / 100;
+  firstNumber = displayValue;
+  operator = "";
+  secondNumber = "";
+  updateDisplay();
+}
+
+// Sélectionner tous les boutons de classe "digit" et ajouter des écouteurs d'événements
 const digitButtons = document.querySelectorAll(".digit");
 digitButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const digit = button.innerText;
-
-    if (!operator) {
-      num1 += digit;
-    } else {
-      num2 += digit;
-    }
-
-    console.log("Num1:", num1);
-    console.log("Num2:", num2);
+    const digit = button.textContent;
+    appendNumber(digit);
   });
 });
 
-// Selecting operator buttons
+// Sélectionner tous les boutons de classe "operator" et ajouter des écouteurs d'événements
 const operatorButtons = document.querySelectorAll(".operator");
 operatorButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    operator = button.innerText;
-    console.log("Operator: ", operator);
+    const op = button.textContent;
+    setOperator(op);
   });
 });
 
-// Selecting the result button
-const resultButton = document.querySelector("#result");
-resultButton.addEventListener("click", () => {
-  let result;
+// Sélectionner le bouton "Clear" et ajouter un écouteur d'événement
+const clearButton = document.getElementById("clear");
+clearButton.addEventListener("click", clear);
 
-  if (operator === "+") {
-    result = operations.add(parseInt(num1), parseInt(num2));
-  } else if (operator === "-") {
-    result = operations.subtract(parseInt(num1), parseInt(num2));
-  } else if (operator === "x") {
-    result = operations.multiply(parseInt(num1), parseInt(num2));
-  } else if (operator === "/") {
-    result = operations.divide(parseInt(num1), parseInt(num2));
-  }
-
-  console.log("Result: ", result);
-});
-
-// Selecting the clear button
-const clearButton = document.querySelector("#clear");
-clearButton.addEventListener("click", () => {
-  num1 = "";
-  num2 = "";
-  operator = "";
-  console.log("Cleared values");
-});
+// Sélectionner le bouton "=" et ajouter un écouteur d'événement
+const equalsButton = document.getElementById("equals");
+equalsButton.addEventListener("click", calculate);
