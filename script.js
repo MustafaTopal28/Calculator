@@ -51,7 +51,7 @@ function calculate() {
     case "-":
       result = parseFloat(firstNumber) - parseFloat(secondNumber);
       break;
-    case "*":
+    case "x":
       result = parseFloat(firstNumber) * parseFloat(secondNumber);
       break;
     case "/":
@@ -93,7 +93,7 @@ function handleKeyPress(event) {
     setOperator("+");
   } else if (key === "-") {
     setOperator("-");
-  } else if (key === "*") {
+  } else if (key === "x") {
     setOperator("*");
   } else if (key === "/") {
     setOperator("/");
