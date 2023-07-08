@@ -1,4 +1,10 @@
 const displayElement = document.getElementById("display");
+const digitButtons = document.querySelectorAll(".digit");
+const operatorButtons = document.querySelectorAll(".operator");
+const decimalButton = document.querySelector(".decimal");
+const clearButton = document.getElementById("clear");
+const backspaceButton = document.getElementById("backspace");
+const equalsButton = document.getElementById("equals");
 let displayValue = "0";
 let firstNumber = "";
 let operator = "";
@@ -37,6 +43,7 @@ function calculate() {
   if (!operator || !firstNumber || !displayValue) return;
   secondNumber = displayValue;
   let result;
+
   switch (operator) {
     case "+":
       result = parseFloat(firstNumber) + parseFloat(secondNumber);
@@ -44,7 +51,7 @@ function calculate() {
     case "-":
       result = parseFloat(firstNumber) - parseFloat(secondNumber);
       break;
-    case "x":
+    case "*":
       result = parseFloat(firstNumber) * parseFloat(secondNumber);
       break;
     case "/":
@@ -56,6 +63,7 @@ function calculate() {
       result = parseFloat(firstNumber) / parseFloat(secondNumber);
       break;
   }
+
   displayValue = Math.round(result * 100) / 100;
   firstNumber = displayValue;
   operator = "";
@@ -63,28 +71,61 @@ function calculate() {
   updateDisplay();
 }
 
-// Sélectionner tous les boutons de classe "digit" et ajouter des écouteurs d'événements
-const digitButtons = document.querySelectorAll(".digit");
+function handleDecimal() {
+  if (!displayValue.includes(".")) {
+    displayValue += ".";
+    updateDisplay();
+  }
+}
+
+function handleBackspace() {
+  displayValue = displayValue.slice(0, -1);
+  updateDisplay();
+}
+
+function handleKeyPress(event) {
+  const key = event.key;
+  if (key >= "0" && key <= "9") {
+    appendNumber(key);
+  } else if (key === ".") {
+    handleDecimal();
+  } else if (key === "+") {
+    setOperator("+");
+  } else if (key === "-") {
+    setOperator("-");
+  } else if (key === "*") {
+    setOperator("*");
+  } else if (key === "/") {
+    setOperator("/");
+  } else if (key === "=" || key === "Enter") {
+    calculate();
+  } else if (key === "Backspace") {
+    handleBackspace();
+  }
+}
+
 digitButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const digit = button.textContent;
-    appendNumber(digit);
+    appendNumber(button.textContent);
   });
 });
 
-// Sélectionner tous les boutons de classe "operator" et ajouter des écouteurs d'événements
-const operatorButtons = document.querySelectorAll(".operator");
 operatorButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    const op = button.textContent;
-    setOperator(op);
+    setOperator(button.textContent);
   });
 });
 
-// Sélectionner le bouton "Clear" et ajouter un écouteur d'événement
-const clearButton = document.getElementById("clear");
+decimalButton.addEventListener("click", handleDecimal);
+
 clearButton.addEventListener("click", clear);
 
-// Sélectionner le bouton "=" et ajouter un écouteur d'événement
-const equalsButton = document.getElementById("equals");
-equalsButton.addEventListener("click", calculate);
+backspaceButton.addEventListener("click", handleBackspace);
+
+equalsButton.addEventListener("click", () => {
+  calculate();
+  firstNumber = displayValue; // Mettre à jour firstNumber avec le résultat final
+  displayValue = firstNumber; // Mise à jour du display avec le résultat final
+});
+
+window.addEventListener("keydown", handleKeyPress);
